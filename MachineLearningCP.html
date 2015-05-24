@@ -138,11 +138,11 @@ training2 &lt;- data3[-inTrain,]</code></pre>
 ##         OOB estimate of  error rate: 0.48%
 ## Confusion matrix:
 ##      A    B    C    D    E  class.error
-## A 4182    2    0    0    1 0.0007168459
-## B   16 2828    4    0    0 0.0070224719
-## C    0   15 2551    1    0 0.0062329568
-## D    0    0   23 2387    2 0.0103648425
-## E    0    0    1    6 2699 0.0025868441</code></pre>
+## A 4184    1    0    0    0 0.0002389486
+## B    9 2834    5    0    0 0.0049157303
+## C    0   17 2547    3    0 0.0077911959
+## D    0    0   28 2382    2 0.0124378109
+## E    0    0    1    4 2701 0.0018477458</code></pre>
 <p>** Recursive Partitioning Training Set 1:</p>
 <pre class="r"><code>part1 &lt;- rpart(formula = classe ~ ., data = training1)
 printcp(part1)</code></pre>
@@ -151,9 +151,9 @@ printcp(part1)</code></pre>
 ## rpart(formula = classe ~ ., data = training1)
 ## 
 ## Variables actually used in tree construction:
-##  [1] accel_dumbbell_y     accel_forearm_x      accel_forearm_y     
-##  [4] accel_forearm_z      gyros_belt_z         gyros_dumbbell_y    
-##  [7] magnet_arm_y         magnet_belt_y        magnet_dumbbell_y   
+##  [1] accel_dumbbell_y     accel_forearm_x      accel_forearm_z     
+##  [4] gyros_dumbbell_y     magnet_arm_x         magnet_belt_x       
+##  [7] magnet_belt_y        magnet_belt_z        magnet_dumbbell_y   
 ## [10] magnet_dumbbell_z    magnet_forearm_z     pitch_belt          
 ## [13] pitch_forearm        roll_forearm         total_accel_dumbbell
 ## [16] yaw_arm              yaw_belt            
@@ -163,22 +163,19 @@ printcp(part1)</code></pre>
 ## n= 14718 
 ## 
 ##          CP nsplit rel error  xerror      xstd
-## 1  0.066244      0   1.00000 1.00000 0.0051957
-## 2  0.031615      4   0.73502 0.73664 0.0057504
-## 3  0.030001      5   0.70341 0.70502 0.0057587
-## 4  0.022026      6   0.67341 0.67711 0.0057562
-## 5  0.018371      9   0.60439 0.61768 0.0057201
-## 6  0.016377     11   0.56764 0.58008 0.0056754
-## 7  0.015665     14   0.51590 0.53593 0.0056006
-## 8  0.015570     15   0.50024 0.52416 0.0055764
-## 9  0.015475     16   0.48467 0.51391 0.0055539
-## 10 0.015190     17   0.46919 0.51068 0.0055466
-## 11 0.014383     18   0.45400 0.49274 0.0055031
-## 12 0.014051     20   0.42523 0.46511 0.0054276
-## 13 0.013102     21   0.41118 0.44850 0.0053771
-## 14 0.013007     22   0.39808 0.42239 0.0052896
-## 15 0.012152     23   0.38508 0.41042 0.0052460
-## 16 0.010000     24   0.37292 0.40065 0.0052087</code></pre>
+## 1  0.065959      0   1.00000 1.00000 0.0051957
+## 2  0.035128      4   0.73616 0.76294 0.0057345
+## 3  0.029431      5   0.70103 0.69885 0.0057589
+## 4  0.021836      6   0.67160 0.67322 0.0057551
+## 5  0.018276      8   0.62793 0.62613 0.0057278
+## 6  0.016520     10   0.59138 0.58625 0.0056839
+## 7  0.014716     11   0.57486 0.54913 0.0056255
+## 8  0.013766     12   0.56014 0.47052 0.0054433
+## 9  0.013292     20   0.42001 0.45495 0.0053972
+## 10 0.012722     21   0.40672 0.42960 0.0053148
+## 11 0.011962     22   0.39400 0.41451 0.0052611
+## 12 0.011108     23   0.38204 0.39466 0.0051852
+## 13 0.010000     24   0.37093 0.38014 0.0051256</code></pre>
 <p>As we can see, the expected error for both models is quite low, but the Random Forest model’s expected error is smaller.</p>
 <p>Having chosen the Random Forest model, the next step is trying the model in training set 2.</p>
 <p>** Random Forest Prediction in Training Set 2:</p>
@@ -188,33 +185,33 @@ confusionMatrix(predictions,training2$classe)</code></pre>
 ## 
 ##           Reference
 ## Prediction    A    B    C    D    E
-##          A 1395    0    0    0    0
-##          B    0  948    9    0    0
-##          C    0    1  846    8    0
-##          D    0    0    0  796    1
-##          E    0    0    0    0  900
+##          A 1394    4    0    0    0
+##          B    0  944    4    0    0
+##          C    0    1  851    5    0
+##          D    0    0    0  799    2
+##          E    1    0    0    0  899
 ## 
 ## Overall Statistics
 ##                                          
-##                Accuracy : 0.9961         
-##                  95% CI : (0.994, 0.9977)
+##                Accuracy : 0.9965         
+##                  95% CI : (0.9945, 0.998)
 ##     No Information Rate : 0.2845         
 ##     P-Value [Acc &gt; NIR] : &lt; 2.2e-16      
 ##                                          
-##                   Kappa : 0.9951         
+##                   Kappa : 0.9956         
 ##  Mcnemar's Test P-Value : NA             
 ## 
 ## Statistics by Class:
 ## 
 ##                      Class: A Class: B Class: C Class: D Class: E
-## Sensitivity            1.0000   0.9989   0.9895   0.9900   0.9989
-## Specificity            1.0000   0.9977   0.9978   0.9998   1.0000
-## Pos Pred Value         1.0000   0.9906   0.9895   0.9987   1.0000
-## Neg Pred Value         1.0000   0.9997   0.9978   0.9981   0.9998
+## Sensitivity            0.9993   0.9947   0.9953   0.9938   0.9978
+## Specificity            0.9989   0.9990   0.9985   0.9995   0.9998
+## Pos Pred Value         0.9971   0.9958   0.9930   0.9975   0.9989
+## Neg Pred Value         0.9997   0.9987   0.9990   0.9988   0.9995
 ## Prevalence             0.2845   0.1935   0.1743   0.1639   0.1837
-## Detection Rate         0.2845   0.1933   0.1725   0.1623   0.1835
-## Detection Prevalence   0.2845   0.1951   0.1743   0.1625   0.1835
-## Balanced Accuracy      1.0000   0.9983   0.9936   0.9949   0.9994</code></pre>
+## Detection Rate         0.2843   0.1925   0.1735   0.1629   0.1833
+## Detection Prevalence   0.2851   0.1933   0.1748   0.1633   0.1835
+## Balanced Accuracy      0.9991   0.9969   0.9969   0.9966   0.9988</code></pre>
 <p>As we can see in the Confusion Matrix results, Accuracy is above 99%, with a very small p-value. We may conclude that this model is useful for making predictions with a high accuracy level.</p>
 </div>
 <div id="preparing-the-testing-set" class="section level2">
