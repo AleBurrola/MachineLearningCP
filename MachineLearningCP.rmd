@@ -1,0 +1,129 @@
+---
+title: "Practical Machine Learning Course Project"
+author: "Ale Burrola"
+date: "Sunday, May 24, 2015"
+output: html_document
+---
+
+## Background
+
+Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it. 6 participants were asked to perform barbell lifts correctly and incorrectly in 5 different ways. The data for this project come from this source: <http://groupware.les.inf.puc-rio.br/har>.
+
+## Objective
+
+The goal of this project is to use the data provided to predict the manner in which they did the exercise. This is the "classe" variable in the training set. Other variablesm ay be used as predictors. This reports describes how the model was build with cross validation, showing sample error and strategy for the selected model. The prediction model will be used to  predict 20 different test cases.
+
+## Loading the Data and Necessary Libraries
+
+The required libraries for this project are dplyr to manage the data sets, caret for choosing the best predictors; randomForest and rpart are used for modeling.
+
+```{r, message=FALSE, warning=FALSE}
+library(dplyr)
+library(caret)
+library(randomForest)
+library(rpart)
+
+data <- read.csv("pml-training.csv",header=T, na.strings=c("",NA))
+```
+
+## Choosing the Best Predictors
+
+By doing some exploratory data analysis, we find that data set includes many variables that have null values and NAs. Some other variables, such as the name of the participant and other non-numeric variables should not be taken into consideration for the prediction model.
+
+```{r}
+data2 <- select(data,c(8:11,37:49,60:68,84:86,102,113:124,140,151:160))
+```
+
+The next step consists of identifying variables with high correlation, and removing them from the data set:
+
+```{r}
+findCorrelation(cor(data2[,-53]), cutoff=0.9, verbose=FALSE)
+data3 <- select(data2, c(2:7,11:18,20:30,32:45,47:53))
+```
+
+Non-zero variables are also checked. After the variables that we already removed, in this case, no additional variables need to be removed.
+
+```{r, results='hide'}
+nearZeroVar(data3, saveMetrics=TRUE)
+```
+
+The final model consists of only 46 variables, including the "classe" variable:
+
+```{r}
+predictors <- names(data3)
+predictors
+```
+
+## Training Sets
+
+The training set has been separated into two training sets, for cross-validation purposes.
+
+```{r}
+inTrain <- createDataPartition(y=data3$classe,p=0.75,list=FALSE)
+training1 <- data3[inTrain,]
+training2 <- data3[-inTrain,]
+```
+
+## Modeling
+
+Random Trees and rpart have been chosen for selecting the models. First, they will be used for modeling in the training set 1.
+
+** Random Forest Training Set 1:
+
+```{r}
+forest1 <- randomForest(classe ~ ., training1, keep.forest=TRUE, ntree=1000)
+    forest1
+```
+
+** Recursive Partitioning Training Set 1:
+
+```{r}
+part1 <- rpart(formula = classe ~ ., data = training1)
+printcp(part1)
+```
+
+As we can see, the expected error for both models is quite low, but the Random Forest model's expected error is smaller.
+
+Having chosen the Random Forest model, the next step is trying the model in training set 2.
+
+** Random Forest Prediction in Training Set 2:
+
+```{r}
+predictions <- predict(forest1, newdata=training2)
+confusionMatrix(predictions,training2$classe)
+```
+
+As we can see in the Confusion Matrix results, Accuracy is above 99%, with a very small p-value. We may conclude that this model is useful for making predictions with a high accuracy level.
+
+## Preparing the Testing Set
+
+Before making the predictions, preparing the data is important. The testing data should only include the necessary predictors.
+
+```{r}
+testing <- read.csv("pml-testing.csv",header=TRUE)
+testing2 <- testing[,colnames(testing)%in%predictors] 
+```
+
+## Making Predictions
+
+As we noted in the modeling section of this report, the selected model is done with Random Forests.
+
+```{r}
+predictionsRF <- predict(forest1, newdata=testing2,type="class") 
+```
+
+## Submitting Results
+
+A code for file creation has been shared in the Course Project's instructions. To use this function, the results should be in a character vector.
+
+```{r}
+answers <- as.character(predictionsRF)
+pml_write_files = function(x){
+    n = length(predictionsRF)
+    for(i in 1:n){
+      filename = paste0("problem_id_",i,".txt")
+      write.table(x[i],file=filename,quote=FALSE,row.names=FALSE,col.names=FALSE)
+    }
+  }
+pml_write_files(answers)
+```
